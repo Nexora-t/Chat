@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 // إعداد Firebase
 const firebaseConfig = {
@@ -25,22 +25,17 @@ const chatForm = document.getElementById("chat-form");
 const messagesDiv = document.getElementById("messages");
 const messageInput = document.getElementById("message");
 const profilePictureInput = document.getElementById("profile-picture");
+const imageUpload = document.getElementById("image-upload");
+const clearMessagesButton = document.getElementById("clear-messages");
 
-// تخزين اسم المستخدم والصورة
-let username = localStorage.getItem("username");
-let profilePicture = localStorage.getItem("profilePicture");
-
-// التحقق من تسجيل الدخول
-if (username) {
-  loginScreen.classList.add("hidden");
-  chatScreen.classList.remove("hidden");
-} else {
-  chatScreen.classList.add("hidden");
-}
+// بيانات المستخدم
+let username = "";
+let profilePicture = "";
 
 // تسجيل الدخول
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
+
   username = document.getElementById("login-username").value.trim();
   const file = profilePictureInput.files[0];
 
@@ -48,57 +43,92 @@ loginForm.addEventListener("submit", (e) => {
     const reader = new FileReader();
     reader.onload = () => {
       profilePicture = reader.result;
-      localStorage.setItem("username", username);
-      localStorage.setItem("profilePicture", profilePicture);
-      loginScreen.classList.add("hidden");
-      chatScreen.classList.remove("hidden");
+      startChat();
     };
     reader.readAsDataURL(file);
   } else {
-    profilePicture = null;
-    localStorage.setItem("username", username);
-    loginScreen.classList.add("hidden");
-    chatScreen.classList.remove("hidden");
+    profilePicture = "https://via.placeholder.com/40"; // صورة افتراضية
+    startChat();
   }
 });
+
+function startChat() {
+  // إخفاء شاشة تسجيل الدخول وإظهار شاشة الدردشة
+  loginScreen.classList.add("hidden");
+  chatScreen.classList.remove("hidden");
+}
 
 // إرسال رسالة
 chatForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const message = messageInput.value.trim();
-  if (message) {
-    push(messagesRef, {
+  const file = imageUpload.files[0];
+
+  if (message || file) {
+    const messageData = {
       username,
-      message,
+      message: message || null,
       profilePicture,
       timestamp: Date.now(),
-    });
+    };
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        messageData.image = reader.result;
+        push(messagesRef, messageData);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      push(messagesRef, messageData);
+    }
+
     messageInput.value = "";
+    imageUpload.value = "";
   }
 });
 
 // عرض الرسائل
 onChildAdded(messagesRef, (snapshot) => {
   const data = snapshot.val();
-  displayMessage(data.username, data.message, data.profilePicture);
+  displayMessage(data, snapshot.key);
+});
+
+// حذف الرسائل
+clearMessagesButton.addEventListener("click", () => {
+  remove(messagesRef)
+    .then(() => {
+      messagesDiv.innerHTML = ""; // مسح الرسائل من الواجهة
+    })
+    .catch((error) => {
+      console.error("خطأ أثناء مسح الرسائل:", error);
+    });
 });
 
 // وظيفة عرض الرسائل
-function displayMessage(username, message, profilePicture) {
+function displayMessage(data, key) {
   const messageDiv = document.createElement("div");
   messageDiv.classList.add("message");
 
   const img = document.createElement("img");
-  img.src = profilePicture || "https://via.placeholder.com/40";
-  img.alt = username;
+  img.src = data.profilePicture || "https://via.placeholder.com/40";
+  img.alt = data.username;
 
   const textDiv = document.createElement("div");
-  textDiv.innerHTML = `<strong>${username}:</strong> ${message}`;
+  textDiv.innerHTML = `<strong>${data.username}:</strong> ${data.message || ""}`;
+
+  if (data.image) {
+    const imageElement = document.createElement("img");
+    imageElement.src = data.image;
+    imageElement.alt = "صورة مرفقة";
+    imageElement.classList.add("chat-image");
+    textDiv.appendChild(imageElement);
+  }
 
   messageDiv.appendChild(img);
   messageDiv.appendChild(textDiv);
   messagesDiv.appendChild(messageDiv);
 
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  messagesDiv.scrollTop = messagesDiv.scrollHeight; // التمرير التلقائي للأسفل
 }

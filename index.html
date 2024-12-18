@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تطبيق دردشة متقدم</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="chat-container">
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-screen" class="login-screen">
+      <h1>مرحبًا بك!</h1>
+      <form id="login-form">
+        <input type="text" id="login-username" placeholder="اسم المستخدم" required>
+        <input type="file" id="profile-picture" accept="image/*">
+        <button type="submit">ابدأ</button>
+      </form>
+    </div>
+
+    <!-- شاشة الدردشة -->
+    <div id="chat-screen" class="chat-screen hidden">
+      <div class="chat-header">
+        <h1>تطبيق الدردشة</h1>
+      </div>
+      <div class="chat-messages" id="messages">
+        <!-- الرسائل ستظهر هنا -->
+      </div>
+      <form id="chat-form" class="chat-input">
+        <input type="text" id="message" placeholder="اكتب رسالتك..." required>
+        <button type="submit">إرسال</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

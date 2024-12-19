@@ -32,6 +32,18 @@ const clearMessagesButton = document.getElementById("clear-messages");
 let username = "";
 let profilePicture = "";
 
+// تحقق من وجود بيانات المستخدم في localStorage
+window.onload = () => {
+  const savedUsername = localStorage.getItem("username");
+  const savedProfilePicture = localStorage.getItem("profilePicture");
+
+  if (savedUsername) {
+    username = savedUsername;
+    profilePicture = savedProfilePicture || "https://via.placeholder.com/40";
+    startChat();
+  }
+};
+
 // تسجيل الدخول
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -43,11 +55,15 @@ loginForm.addEventListener("submit", (e) => {
     const reader = new FileReader();
     reader.onload = () => {
       profilePicture = reader.result;
+      localStorage.setItem("username", username);  // حفظ اسم المستخدم في localStorage
+      localStorage.setItem("profilePicture", profilePicture);  // حفظ صورة الملف الشخصي
       startChat();
     };
     reader.readAsDataURL(file);
   } else {
     profilePicture = "https://via.placeholder.com/40"; // صورة افتراضية
+    localStorage.setItem("username", username);  // حفظ اسم المستخدم في localStorage
+    localStorage.setItem("profilePicture", profilePicture);  // حفظ صورة الملف الشخصي
     startChat();
   }
 });

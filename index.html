@@ -1,40 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تطبيق دردشة متقدم</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة القصص العربية</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            font-size: 24px;
+        }
+
+        .stories-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .story {
+            width: 250px;
+            margin: 15px;
+            cursor: pointer;
+            text-align: center;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .story img {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+        }
+
+        .story h2 {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .story-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .story-content img {
+            width: 50%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .story-content p {
+            font-size: 18px;
+            padding: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-  <div class="chat-container">
-    <!-- شاشة تسجيل الدخول -->
-    <div id="login-screen" class="login-screen">
-      <h1>مرحبًا بك!</h1>
-      <form id="login-form">
-        <input type="text" id="login-username" placeholder="اسم المستخدم" required>
-        <input type="file" id="profile-picture" accept="image/*">
-        <button type="submit">ابدأ</button>
-      </form>
+
+    <header>
+        <h1>مكتبة القصص العربية</h1>
+    </header>
+
+    <div id="mainPage">
+        <div class="stories-container" id="stories">
+            <!-- ستتم إضافة القصص هنا عبر JavaScript -->
+        </div>
     </div>
 
-    <!-- شاشة الدردشة -->
-    <div id="chat-screen" class="chat-screen hidden">
-      <div class="chat-header">
-        <h1>تطبيق الدردشة</h1>
-        <button id="clear-messages">مسح الرسائل</button>
-      </div>
-      <div class="chat-messages" id="messages">
-        <!-- الرسائل ستظهر هنا -->
-      </div>
-      <form id="chat-form" class="chat-input">
-        <input type="text" id="message" placeholder="اكتب رسالتك..." required>
-        <input type="file" id="image-upload" accept="image/*">
-        <button type="submit">إرسال</button>
-      </form>
-    </div>
-  </div>
+    <div id="storyPage" style="display: none;">
+        <header>
+            <h1 id="storyTitle"></h1>
+        </header>
 
-  <script type="module" src="main.js"></script>
+        <div class="story-content">
+            <img id="storyImage" src="" alt="">
+            <p id="storyText"></p>
+            <button onclick="showMainPage()">رجوع</button>
+        </div>
+    </div>
+
+    <script>
+        // قائمة القصص
+        const stories = [
+            {
+                title: "قصة الأسد والفأر",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Lion_and_mouse_by_Harrison_Weir.jpg/250px-Lion_and_mouse_by_Harrison_Weir.jpg",
+                content: "كان هناك أسد نائم في الغابة، فجاء فأر صغير وأخذ يلعب فوقه..."
+            },
+            {
+                title: "قصة الغراب والإبريق",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/The_Crow_and_the_Pitcher_-_Project_Gutenberg_etext_19994.jpg/250px-The_Crow_and_the_Pitcher_-_Project_Gutenberg_etext_19994.jpg",
+                content: "كان هناك غراب عطشان يبحث عن الماء، فوجد إبريقًا به ماء قليل..."
+            }
+        ];
+
+        const storiesContainer = document.getElementById("stories");
+        const mainPage = document.getElementById("mainPage");
+        const storyPage = document.getElementById("storyPage");
+
+        // عرض القصص في الصفحة الرئيسية
+        stories.forEach((story, index) => {
+            let storyDiv = document.createElement("div");
+            storyDiv.classList.add("story");
+            storyDiv.innerHTML = `
+                <img src="${story.image}" alt="${story.title}">
+                <h2>${story.title}</h2>
+            `;
+            storyDiv.onclick = () => showStory(index);
+            storiesContainer.appendChild(storyDiv);
+        });
+
+        // فتح القصة
+        function showStory(index) {
+            let story = stories[index];
+            document.getElementById("storyTitle").textContent = story.title;
+            document.getElementById("storyImage").src = story.image;
+            document.getElementById("storyText").textContent = story.content;
+
+            mainPage.style.display = "none";
+            storyPage.style.display = "block";
+        }
+
+        // الرجوع إلى الصفحة الرئيسية
+        function showMainPage() {
+            mainPage.style.display = "block";
+            storyPage.style.display = "none";
+        }
+    </script>
+
 </body>
 </html>
